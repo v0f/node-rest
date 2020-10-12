@@ -28,4 +28,9 @@ const task_delete = async id => {
   return deleted_task ? deleted_task.id : '';
 };
 
-module.exports = { getAll, get, post, put, task_delete };
+const unassign_user_tasks = async user_id => {
+  const user_tasks = _.filter(db.Tasks, ['userId', user_id]);
+  user_tasks.map(t => _.assign(t, { userId: null }));
+};
+
+module.exports = { getAll, get, post, put, task_delete, unassign_user_tasks };

@@ -5,7 +5,7 @@ const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
-const { requestLogger, errHandler } = require('./common/logger');
+const { requestLogger, logger } = require('./common/logger');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -28,9 +28,22 @@ app.use('/users', userRouter);
 app.use('/boards', boardRouter);
 boardRouter.use('/:boardId/tasks', taskRouter);
 
-app.use(errHandler);
+// error handlers
+app.use((error, req, res, next) => {
+  logger.error('500: Internal server error.');
+  res.status(500).send('Internal server error');
+  next();
+});
 
-// ********** for cross-check **********
+process.on('uncaughtException', error => {
+  logger.error(`uncaughtException: ${error.message}`);
+});
+
+process.on('unhandledRejection', reason => {
+  logger.error(`unhandledRejection: ${reason.message}`);
+});
+
+// ********** uncomment for cross-check **********
 // uncaughtException
 // throw Error('Oops!');
 // unhandledRejection

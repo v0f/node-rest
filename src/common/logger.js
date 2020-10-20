@@ -1,34 +1,36 @@
-const { createLogger, format, transports } = require('winston');
+const winston = require('winston');
 const morgan = require('morgan');
 const path = require('path');
 
-const logfile_path = path.resolve(__dirname, '../../logs/log.log');
-
-const logger = createLogger({
-  format: format.combine(format.colorize(), format.cli()),
+winston.configure({
+  format: winston.format.combine(
+    winston.format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+    winston.format.printf(
+      log => `[${log.timestamp}] ${log.level}: ${log.message}`
+    )
+  ),
   transports: [
-    new transports.Console(),
-    new transports.File({
-      filename: logfile_path,
-      format: format.combine(format.uncolorize(), format.json()),
-      maxsize: 3000000,
-      maxFiles: 1
+    new winston.transports.Console(),
+    new winston.transports.File({
+      filename: path.resolve(__dirname, '../../logs/log.log')
     })
   ],
   exitOnError: false
 });
 
-const errHandler = (error, req, res) => {
-  logger.log('error', '500: Internal server error.');
-  res.status(500).send('Internal server error');
-};
+const requestLogger = morgan(
+  (tokens, req) => {
+    const query = JSON.stringify(req.query);
+    const body = JSON.stringify(req.body);
+    return `URL: ${req.originalUrl} PARAMS: ${query} BODY: ${body}`;
+  },
+  {
+    stream: {
+      write(message) {
+        winston.info(message);
+      }
+    }
+  }
+);
 
-process.on('uncaughtException', error => {
-  logger.error(`uncaughtException: ${error.stack}`);
-});
-
-process.on('unhandledRejection', reason => {
-  logger.error(`unhandledRejection: ${reason.message}`);
-});
-
-module.exports = { requestLogger, errHandler, logger };
+module.exports = { requestLogger, logger: winston };

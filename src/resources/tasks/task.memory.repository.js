@@ -1,40 +1,31 @@
-const db = require('../../common/db');
-const _ = require('lodash');
 const Task = require('./task.model');
 
 const getAll = async () => {
-  return db.Tasks;
+  return await Task.find({}).exec();
 };
 
 const get = async id => {
-  const task = _.find(db.Tasks, ['id', id]);
-  return task;
+  return await Task.findById(id).exec();
 };
 
 const put = async (id, put_data) => {
-  const task = _.find(db.Tasks, ['id', id]);
-  _.assign(task, put_data);
-  return task;
+  return await Task.findByIdAndUpdate(id, put_data).exec();
 };
 
 const post = async post_data => {
-  const task = new Task(post_data);
-  db.Tasks.push(task);
-  return task;
+  return await Task.create(post_data);
 };
 
 const task_delete = async id => {
-  const [deleted_task] = _.remove(db.Tasks, e => e.id === id);
-  return deleted_task ? deleted_task.id : '';
+  return await Task.findByIdAndDelete(id).exec();
 };
 
 const unassign_user_tasks = async user_id => {
-  const user_tasks = _.filter(db.Tasks, ['userId', user_id]);
-  user_tasks.map(t => _.assign(t, { userId: null }));
+  return await Task.updateMany({ user: { _id: user_id } }, { user: null });
 };
 
 const delete_tasks_by_board = async board_id => {
-  _.remove(db.Tasks, t => t.boardId === board_id);
+  return await Task.deleteMany({ board: { _id: board_id } });
 };
 
 module.exports = {

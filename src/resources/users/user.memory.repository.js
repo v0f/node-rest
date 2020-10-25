@@ -1,30 +1,23 @@
-const db = require('../../common/db');
-const _ = require('lodash');
 const User = require('./user.model');
 
 const getAll = async () => {
-  return db.Users;
+  return await User.find({}, '-password').exec();
 };
 
 const get = async id => {
-  const user = _.find(db.Users, ['id', id]);
-  return _.omit(user, 'password');
+  return await User.findById(id, '-password').exec();
 };
 
 const put = async (id, put_data) => {
-  const user = _.find(db.Users, ['id', id]);
-  _.assign(user, put_data);
-  return _.omit(user, 'password');
+  return await User.findByIdAndUpdate(id, put_data).exec();
 };
 
 const post = async post_data => {
-  const user = new User(post_data);
-  db.Users.push(user);
-  return _.omit(user, 'password');
+  return await User.create(post_data);
 };
 
 const user_delete = async id => {
-  _.remove(db.Users, e => e.id === id);
+  return await User.findByIdAndDelete(id).exec();
 };
 
 module.exports = { getAll, get, post, put, user_delete };

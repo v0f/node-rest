@@ -30,18 +30,18 @@ boardRouter.use('/:boardId/tasks', taskRouter);
 
 // error handlers
 app.use((error, req, res, next) => {
-  logger.error('500: Internal server error.');
+  logger.error(`500: Internal server error.${error.message}`);
   res.status(500).send('Internal server error');
   next();
 });
 
-process.on('uncaughtException', error => {
-  logger.error(`uncaughtException: ${error.message}`);
-});
+// process.on('uncaughtException', error => {
+//   logger.error(`uncaughtException: ${error.message}`);
+// });
 
-process.on('unhandledRejection', reason => {
-  logger.error(`unhandledRejection: ${reason.message}`);
-});
+// process.on('unhandledRejection', reason => {
+//   logger.error(`unhandledRejection: ${reason.message}`);
+// });
 
 // ********** uncomment for cross-check **********
 // uncaughtException

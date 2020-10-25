@@ -1,31 +1,23 @@
-const db = require('../../common/db');
-const _ = require('lodash');
 const Board = require('./board.model');
 
 const getAll = async () => {
-  return db.Boards;
+  return await Board.find({}).exec();
 };
 
 const get = async id => {
-  const board = _.find(db.Boards, ['id', id]);
-  return board;
+  return await Board.findById(id).exec();
 };
 
 const put = async (id, put_data) => {
-  const board = _.find(db.Boards, ['id', id]);
-  _.assign(board, put_data);
-  return board;
+  return await Board.findByIdAndUpdate(id, put_data).exec();
 };
 
 const post = async post_data => {
-  const board = new Board(post_data);
-  db.Boards.push(board);
-  return board;
+  return await Board.create(post_data);
 };
 
 const board_delete = async id => {
-  const [deleted_board] = _.remove(db.Boards, e => e.id === id);
-  return deleted_board ? deleted_board.id : '';
+  return await Board.findByIdAndDelete(id).exec();
 };
 
 module.exports = { getAll, get, post, put, board_delete };

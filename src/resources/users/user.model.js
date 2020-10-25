@@ -1,17 +1,12 @@
-const uuid = require('uuid');
+const mongoose = require('mongoose');
 
-class User {
-  constructor({
-    id = uuid(),
-    name = 'USER',
-    login = 'user',
-    password = 'P@55w0rd'
-  } = {}) {
-    this.id = id;
-    this.name = name;
-    this.login = login;
-    this.password = password;
-  }
-}
+const UserSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    login: { type: String, required: true },
+    password: { type: String, required: true, select: false }
+  },
+  { toJSON: { virtuals: true, useProjection: true } }
+);
 
-module.exports = User;
+module.exports = mongoose.model('User', UserSchema);

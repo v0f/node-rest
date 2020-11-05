@@ -8,6 +8,10 @@ const get = async id => {
   return await User.findById(id, '-password').exec();
 };
 
+const getByLogin = async login => {
+  return await User.findOne({ login }).exec();
+};
+
 const put = async (id, put_data) => {
   return await User.findByIdAndUpdate(id, put_data).exec();
 };
@@ -20,4 +24,4 @@ const user_delete = async id => {
   return await User.findByIdAndDelete(id).exec();
 };
 
-module.exports = { getAll, get, post, put, user_delete };
+module.exports = { getAll, get, post, put, user_delete, getByLogin };

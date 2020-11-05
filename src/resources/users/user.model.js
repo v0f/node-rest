@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema(
   {
@@ -8,5 +9,10 @@ const UserSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true, useProjection: true } }
 );
+
+UserSchema.pre('save', async function save(next) {
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
 module.exports = mongoose.model('User', UserSchema);
